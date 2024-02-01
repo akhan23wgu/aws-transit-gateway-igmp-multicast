@@ -183,6 +183,80 @@ Resources:
       Properties:
         VpcId: !Ref 'MCastVPC'
 
+    # Test instances
+
+    MCastInstance1:
+      Type: AWS::EC2::Instance
+      DependsOn: MCastS3Endpoint # to do its yum install
+      Properties:
+        ImageId: !Ref LatestAmiId
+        AvailabilityZone: !Select
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        InstanceType: t3.nano
+        UserData: 
+          Fn::Base64: !Sub |
+                  ${MCastUserData}
+        NetworkInterfaces:
+         - DeviceIndex: 0
+           SubnetId: !Ref 'MCastSubnetPrivateA'
+           GroupSet: [!Ref 'MCastSG']
+        Tags:
+          - Key: Name
+            Value: 'Multicast test instance 1'
+
+    MCastInstance2:
+      Type: AWS::EC2::Instance
+      DependsOn: MCastS3Endpoint # to do its yum install
+      Properties:
+        ImageId: !Ref LatestAmiId
+        AvailabilityZone: !Select
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        InstanceType: t3.nano
+        UserData: 
+          Fn::Base64: !Sub |
+                  ${MCastUserData}
+        NetworkInterfaces:
+         - DeviceIndex: 0
+           SubnetId: !Ref 'MCastSubnetPrivateA'
+           GroupSet: [!Ref 'MCastSG']
+        Tags:
+          - Key: Name
+            Value: 'Multicast test instance 2'
+
+    MCastInstance3:
+      Type: AWS::EC2::Instance
+      DependsOn: MCastS3Endpoint # to do its yum install
+      Properties:
+        ImageId: !Ref LatestAmiId
+        AvailabilityZone:  !Select
+          - 1
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        InstanceType: t3.nano
+        UserData: 
+          Fn::Base64: !Sub |
+                  ${MCastUserData}
+        NetworkInterfaces:
+         - DeviceIndex: 0
+           SubnetId: !Ref 'MCastSubnetPrivateB'
+           GroupSet: [!Ref 'MCastSG']
+        Tags:
+          - Key: Name
+            Value: 'Multicast test instance 3'
+
+    MCastSubnetAPrivateRouteAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref 'MCastRouteTablePrivate'
+        SubnetId: !Ref 'MCastSubnetPrivateA'
+
+    MCastSubnetBPrivateRouteAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref 'MCastRouteTablePrivate'
+        SubnetId: !Ref 'MCastSubnetPrivateB'
+
     # Transit Gateway setup
 
     MCastTGW:
